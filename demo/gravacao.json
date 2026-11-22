@@ -1,0 +1,392 @@
+{
+  "gerado_por": "scripts/gravar_demo.py (cliente MCP real, transporte stdio)",
+  "agora_simulado": "22/11/2026 10:00",
+  "compra": {
+    "sessao": "agente:ag-ana-planilhas",
+    "ferramentas": [
+      "buscar_ofertas",
+      "detalhar_oferta",
+      "gerar_link_checkout"
+    ],
+    "chamadas": [
+      {
+        "ferramenta": "buscar_ofertas",
+        "argumentos": {
+          "consulta": "excel para montar dashboards no trabalho",
+          "preco_max": 200
+        },
+        "resposta": {
+          "criterio_de_ordenacao": "relevância do texto; comissão não influencia",
+          "curadoria": "Agente da Ana, Finanças & Planilhas",
+          "ofertas": [
+            {
+              "oferta_id": "of-excel-dashboard",
+              "nome": "Excel do Zero ao Dashboard",
+              "produtor": "Planilha Viva (Prof. Marina Lopes)",
+              "tipo": "digital",
+              "preco": 197.0,
+              "garantia_dias": 15,
+              "resumo_verificado": "Curso em vídeo para sair do zero e montar dashboards no Excel."
+            },
+            {
+              "oferta_id": "of-planilha-controle",
+              "nome": "Planilha de Controle Financeiro (modelo pronto)",
+              "produtor": "Bolso em Dia",
+              "tipo": "digital",
+              "preco": 37.0,
+              "garantia_dias": 7,
+              "resumo_verificado": "Modelo de planilha pronto para controlar gastos mensais."
+            }
+          ]
+        }
+      },
+      {
+        "ferramenta": "detalhar_oferta",
+        "argumentos": {
+          "oferta_id": "of-excel-dashboard"
+        },
+        "resposta": {
+          "oferta_id": "of-excel-dashboard",
+          "nome": "Excel do Zero ao Dashboard",
+          "produtor": "Planilha Viva (Prof. Marina Lopes)",
+          "preco": 197.0,
+          "parcelas_max": 12,
+          "garantia_dias": 15,
+          "politica_de_reembolso": "Reembolso integral se pedido em até 15 dias após a compra, pela própria plataforma.",
+          "versao_ficha": 3,
+          "fonte": "Ficha de fatos aprovada pelo produtor e conferida com o checkout. Não é texto de marketing.",
+          "aprovada_em": "2026-11-18",
+          "resumo": "Curso em vídeo para sair do zero e montar dashboards no Excel.",
+          "conteudo": [
+            "8 módulos, 42 aulas, cerca de 14 h de vídeo",
+            "Fórmulas essenciais, tabela dinâmica, gráficos e dashboard final",
+            "3 planilhas de exercício para baixar"
+          ],
+          "para_quem": "Iniciantes que usam Excel no trabalho.",
+          "nao_e_para": "Quem já domina tabela dinâmica e Power Query.",
+          "acesso": "12 meses",
+          "suporte": "Dúvidas por comentário na aula, resposta em até 2 dias úteis",
+          "certificado": true,
+          "nao_promete": [
+            "Não garante emprego ou promoção."
+          ]
+        }
+      },
+      {
+        "ferramenta": "gerar_link_checkout",
+        "argumentos": {
+          "oferta_id": "of-excel-dashboard",
+          "versao_ficha": 2
+        },
+        "resposta": {
+          "erro": "ficha_desatualizada",
+          "mensagem": "A oferta mudou desde a sua leitura. Releia com detalhar_oferta antes de informar valores ao comprador.",
+          "versao_atual": 3,
+          "preco_atual": 197.0,
+          "garantia_dias_atual": 15
+        }
+      },
+      {
+        "ferramenta": "gerar_link_checkout",
+        "argumentos": {
+          "oferta_id": "of-excel-dashboard",
+          "versao_ficha": 3
+        },
+        "resposta": {
+          "link_checkout": "https://checkout.youshop.example/c/of-excel-dashboard?elo=eyJvIjoib2YtZXhjZWwtZGFzaGJvYXJkIiwidiI6MywiYSI6ImFnLWFuYS1wbGFuaWxoYXMiLCJjIjoiY3ItYW5hIiwiaWF0IjoxNzk1MzUyNDAwLCJleHAiOjE3OTU2MTE2MDB9.9IBVZZxYPoUfnLbpAgfKrEnPyhg8uTdmDrhulg5VkZk",
+          "preco": 197.0,
+          "garantia_dias": 15,
+          "valido_ate": "25/11/2026 10:00",
+          "divulgacao_obrigatoria": "Esta recomendação vem do agente de Ana Ribeiro, creator que recebe comissão se você comprar por este link. O preço é o mesmo para você.",
+          "aviso_ao_comprador": "O pagamento é feito no checkout seguro da YouShop. Confira o valor lá antes de pagar."
+        }
+      }
+    ]
+  },
+  "checkout": {
+    "link_valido": {
+      "oferta_id": "of-excel-dashboard",
+      "preco": 197.0,
+      "garantia_dias": 15,
+      "toque": {
+        "tipo": "agente",
+        "creator_id": "cr-ana",
+        "agente_id": "ag-ana-planilhas",
+        "quando": "22/11/2026 10:00"
+      }
+    },
+    "link_adulterado": {
+      "oferta_id": "of-excel-dashboard",
+      "preco": 197.0,
+      "toque": null,
+      "aviso": "Atribuição ignorada (assinatura não confere)."
+    }
+  },
+  "painel_creator": {
+    "sessao": "creator:cr-ana",
+    "ferramentas": [
+      "buscar_ofertas",
+      "detalhar_oferta",
+      "gerar_link_checkout",
+      "minhas_vendas",
+      "rastro_da_comissao"
+    ],
+    "chamadas": [
+      {
+        "ferramenta": "minhas_vendas",
+        "argumentos": {},
+        "resposta": {
+          "creator": "Ana Ribeiro",
+          "vendas": [
+            {
+              "venda_id": "V-1042",
+              "produto": "Excel do Zero ao Dashboard",
+              "pago_em": "20/11/2026 21:47",
+              "status": "em_garantia",
+              "comissao": 78.8,
+              "libera_em": "05/12/2026"
+            },
+            {
+              "venda_id": "V-1031",
+              "produto": "Excel do Zero ao Dashboard",
+              "pago_em": "18/11/2026 19:05",
+              "status": "nao_comissionada",
+              "comissao": 0.0
+            },
+            {
+              "venda_id": "V-1019",
+              "produto": "Finanças Pessoais na Prática",
+              "pago_em": "15/11/2026 08:20",
+              "status": "nao_comissionada",
+              "comissao": 0.0
+            },
+            {
+              "venda_id": "V-1008",
+              "produto": "Power BI Essencial",
+              "pago_em": "09/11/2026 15:12",
+              "status": "estornada",
+              "comissao": 0.0
+            },
+            {
+              "venda_id": "V-0987",
+              "produto": "Planilha de Controle Financeiro (modelo pronto)",
+              "pago_em": "28/10/2026 12:30",
+              "status": "liberada",
+              "comissao": 18.5,
+              "libera_em": "04/11/2026"
+            },
+            {
+              "venda_id": "V-0975",
+              "produto": "Excel do Zero ao Dashboard",
+              "pago_em": "12/11/2026 20:15",
+              "status": "em_garantia",
+              "comissao": 78.8,
+              "libera_em": "27/11/2026"
+            }
+          ],
+          "a_liberar": 157.6,
+          "liberado": 18.5,
+          "dica": "Use rastro_da_comissao(venda_id) para entender qualquer linha."
+        }
+      },
+      {
+        "ferramenta": "rastro_da_comissao",
+        "argumentos": {
+          "venda_id": "V-1042"
+        },
+        "resposta": {
+          "venda_id": "V-1042",
+          "produto": "Excel do Zero ao Dashboard",
+          "status": "em_garantia",
+          "codigo_motivo": "aguardando_fim_da_garantia",
+          "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).",
+          "linha_do_tempo": [
+            {
+              "quando": "20/11/2026 21:31",
+              "evento": "Agente da Ana (conversa no ChatGPT)",
+              "seu": true,
+              "contou_para_a_comissao": true
+            },
+            {
+              "quando": "20/11/2026 21:47",
+              "evento": "Pagamento aprovado (Pix)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            }
+          ],
+          "explicacao_base": "A venda é sua. A comissão de R$ 78,80 fica reservada até o fim da garantia de 15 dias e libera em 05/12/2026.",
+          "proximo_passo": "Nada a fazer: é só aguardar a liberação.",
+          "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."
+        }
+      },
+      {
+        "ferramenta": "rastro_da_comissao",
+        "argumentos": {
+          "venda_id": "V-1031"
+        },
+        "resposta": {
+          "venda_id": "V-1031",
+          "produto": "Excel do Zero ao Dashboard",
+          "status": "nao_comissionada",
+          "codigo_motivo": "toque_de_outro_creator_venceu",
+          "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).",
+          "linha_do_tempo": [
+            {
+              "quando": "16/11/2026 12:40",
+              "evento": "Seu link no Instagram (stories)",
+              "seu": true,
+              "contou_para_a_comissao": false
+            },
+            {
+              "quando": "18/11/2026 19:03",
+              "evento": "Cupom de outro creator",
+              "seu": false,
+              "contou_para_a_comissao": true
+            },
+            {
+              "quando": "18/11/2026 19:05",
+              "evento": "Pagamento aprovado (Cartão 12x)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            }
+          ],
+          "explicacao_base": "Seu link foi o primeiro contato do comprador, mas depois dele houve um toque de outro creator, e a regra desta oferta paga o último toque válido.",
+          "proximo_passo": "Peça ao produtor um cupom exclusivo seu: assim o seu toque também aparece no momento da compra.",
+          "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."
+        }
+      },
+      {
+        "ferramenta": "rastro_da_comissao",
+        "argumentos": {
+          "venda_id": "V-1019"
+        },
+        "resposta": {
+          "venda_id": "V-1019",
+          "produto": "Finanças Pessoais na Prática",
+          "status": "nao_comissionada",
+          "codigo_motivo": "seu_toque_fora_da_janela",
+          "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).",
+          "linha_do_tempo": [
+            {
+              "quando": "05/11/2026 22:10",
+              "evento": "Seu link no YouTube (descrição do vídeo)",
+              "seu": true,
+              "contou_para_a_comissao": false
+            },
+            {
+              "quando": "15/11/2026 08:20",
+              "evento": "Pagamento aprovado (Cartão 6x)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            }
+          ],
+          "explicacao_base": "Seu link foi clicado, mas a compra aconteceu 9 dias depois. A janela desta oferta é de 7 dias, então o clique já não valia.",
+          "proximo_passo": "Conteúdos de lembrete perto do fim da janela, ou o seu agente de recomendação, mantêm o seu toque válido mais perto da compra.",
+          "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."
+        }
+      },
+      {
+        "ferramenta": "rastro_da_comissao",
+        "argumentos": {
+          "venda_id": "V-1008"
+        },
+        "resposta": {
+          "venda_id": "V-1008",
+          "produto": "Power BI Essencial",
+          "status": "estornada",
+          "codigo_motivo": "reembolso_dentro_da_garantia",
+          "regra_aplicada": "Último toque válido de creator até 14 dias antes do pagamento (regra escolhida pelo produtor).",
+          "linha_do_tempo": [
+            {
+              "quando": "09/11/2026 14:58",
+              "evento": "Agente da Ana (conversa no Claude)",
+              "seu": true,
+              "contou_para_a_comissao": true
+            },
+            {
+              "quando": "09/11/2026 15:12",
+              "evento": "Pagamento aprovado (Cartão 3x)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            },
+            {
+              "quando": "13/11/2026 10:00",
+              "evento": "Reembolso pedido pelo comprador (dentro da garantia)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            }
+          ],
+          "explicacao_base": "A venda era sua, mas o comprador pediu reembolso dentro da garantia em 13/11/2026. Pela regra da plataforma, a comissão de R$ 118,80 foi estornada.",
+          "proximo_passo": "Nenhuma ação sua é necessária. O direito de arrependimento é do comprador.",
+          "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."
+        }
+      },
+      {
+        "ferramenta": "rastro_da_comissao",
+        "argumentos": {
+          "venda_id": "V-0987"
+        },
+        "resposta": {
+          "venda_id": "V-0987",
+          "produto": "Planilha de Controle Financeiro (modelo pronto)",
+          "status": "liberada",
+          "codigo_motivo": "liberada",
+          "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).",
+          "linha_do_tempo": [
+            {
+              "quando": "28/10/2026 12:22",
+              "evento": "Seu link no Instagram (bio)",
+              "seu": true,
+              "contou_para_a_comissao": true
+            },
+            {
+              "quando": "28/10/2026 12:30",
+              "evento": "Pagamento aprovado (Pix)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            }
+          ],
+          "explicacao_base": "A venda é sua e a comissão de R$ 18,50 já foi liberada em 04/11/2026.",
+          "proximo_passo": "Valor disponível para saque.",
+          "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."
+        }
+      },
+      {
+        "ferramenta": "rastro_da_comissao",
+        "argumentos": {
+          "venda_id": "V-0975"
+        },
+        "resposta": {
+          "venda_id": "V-0975",
+          "produto": "Excel do Zero ao Dashboard",
+          "status": "em_garantia",
+          "codigo_motivo": "aguardando_fim_da_garantia",
+          "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).",
+          "linha_do_tempo": [
+            {
+              "quando": "11/11/2026 18:30",
+              "evento": "Seu link no TikTok",
+              "seu": true,
+              "contou_para_a_comissao": true
+            },
+            {
+              "quando": "12/11/2026 20:09",
+              "evento": "Agente sem creator (não gera nem tira comissão)",
+              "seu": false,
+              "contou_para_a_comissao": false
+            },
+            {
+              "quando": "12/11/2026 20:15",
+              "evento": "Pagamento aprovado (Pix)",
+              "seu": null,
+              "contou_para_a_comissao": null
+            }
+          ],
+          "explicacao_base": "A venda é sua. A comissão de R$ 78,80 fica reservada até o fim da garantia de 15 dias e libera em 27/11/2026. O comprador terminou a compra num assistente de IA sem creator; pela regra do Elo, agente sem creator não tira a comissão de quem trouxe o comprador.",
+          "proximo_passo": "Nada a fazer: é só aguardar a liberação.",
+          "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."
+        }
+      }
+    ]
+  }
+}

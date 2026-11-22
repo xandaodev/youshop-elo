@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elo: demo do protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout: conversa à esquerda, "o que a plataforma vê" à direita; o fio do Rastro é o único elemento de destaque. */
+  --papel: #EDF0F4;
+  --superficie: #FFFFFF;
+  --tinta: #13233F;
+  --tinta-suave: #56627A;
+  --linha: #D2D8E1;
+  --elo: #A8E10C;
+  --elo-texto: #3D6600;
+  --aviso: #9A6212;
+  --aviso-fundo: #FCF1DE;
+  --corte: #A63A31;
+  --corte-fundo: #FBE9E7;
+  --ok-fundo: #EEF8D6;
+  --fonte: "Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #0E1729; --superficie: #15223A; --tinta: #E7ECF4; --tinta-suave: #9AA6BC;
+    --linha: #2A3955; --elo: #B4EC1F; --elo-texto: #C9F264; --aviso: #E8B25A;
+    --aviso-fundo: #2E2513; --corte: #EE8A7F; --corte-fundo: #331C1C; --ok-fundo: #1E2B12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #0E1729; --superficie: #15223A; --tinta: #E7ECF4; --tinta-suave: #9AA6BC;
+  --linha: #2A3955; --elo: #B4EC1F; --elo-texto: #C9F264; --aviso: #E8B25A;
+  --aviso-fundo: #2E2513; --corte: #EE8A7F; --corte-fundo: #331C1C; --ok-fundo: #1E2B12;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--fonte);
+  font-size: 16px;
+  line-height: 1.5;
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--elo); outline-offset: 2px; border-radius: 4px; }
+
+.pagina { max-width: 1180px; margin: 0 auto; padding: 32px 20px 56px; display: grid; gap: 28px; }
+
+/* Cabeçalho */
+.cabecalho { display: grid; gap: 12px; max-width: 780px; }
+.autoria { margin: 0; color: var(--tinta-suave); font-size: 0.875rem; }
+h1 {
+  margin: 0; font-size: clamp(1.75rem, 3.6vw, 2.75rem); line-height: 1.12;
+  font-weight: 800; letter-spacing: -0.02em; text-wrap: balance;
+}
+.resumo { margin: 0; font-size: 1.0625rem; color: var(--tinta-suave); max-width: 66ch; }
+.resumo strong { color: var(--tinta); font-weight: 700; }
+
+/* Passos */
+.passos { display: flex; flex-wrap: wrap; gap: 8px; }
+.passo {
+  font: inherit; font-size: 0.9375rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 16px 10px 10px; border-radius: 999px;
+  background: var(--superficie); color: var(--tinta); border: 1px solid var(--linha);
+}
+.passo .num {
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: 0.8125rem; background: var(--papel); color: var(--tinta-suave);
+}
+.passo[aria-selected="true"] { background: var(--tinta); color: var(--superficie); border-color: var(--tinta); }
+.passo[aria-selected="true"] .num { background: var(--elo); color: #13233F; }
+
+/* Palco */
+.palco { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .palco { grid-template-columns: 1fr; } }
+.coluna { display: grid; gap: 14px; }
+.titulo-coluna { margin: 0; font-size: 0.9375rem; font-weight: 700; color: var(--tinta-suave); }
+.painel { background: var(--superficie); border: 1px solid var(--linha); border-radius: 14px; padding: 18px; display: grid; gap: 14px; }
+.painel h3 { margin: 0; font-size: 1rem; font-weight: 700; }
+.painel p { margin: 0; }
+.nota { font-size: 0.875rem; color: var(--tinta-suave); }
+
+/* Conversa */
+.conversa { display: grid; gap: 12px; }
+.conversa > *, .coluna > *, .painel > * { min-width: 0; }
+.msg { max-width: 92%; padding: 12px 14px; border-radius: 14px; display: grid; gap: 6px; }
+.msg p, .msg ul { margin: 0; }
+.msg ul { padding-left: 1.1em; display: grid; gap: 2px; }
+.msg .quem { font-size: 0.8125rem; font-weight: 700; color: var(--tinta-suave); }
+.msg.pessoa { justify-self: end; background: var(--tinta); color: var(--superficie); border-bottom-right-radius: 4px; }
+.msg.pessoa .quem { color: inherit; opacity: 0.75; }
+.msg.agente { justify-self: start; background: var(--superficie); border: 1px solid var(--linha); border-bottom-left-radius: 4px; }
+.divulgacao { border-left: 3px solid var(--elo); padding-left: 10px; font-size: 0.9375rem; }
+.link-falso { font-family: var(--mono); font-size: 0.8125rem; word-break: break-all; color: var(--elo-texto); }
+
+/* Chamadas de ferramenta */
+details.chamada { justify-self: stretch; border: 1px dashed var(--linha); border-radius: 10px; background: transparent; }
+details.chamada > summary {
+  cursor: pointer; list-style: none; padding: 8px 12px; font-size: 0.875rem; color: var(--tinta-suave);
+  display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap;
+}
+details.chamada > summary::-webkit-details-marker { display: none; }
+details.chamada > summary::before { content: "▸"; transition: transform .15s; }
+details.chamada[open] > summary::before { transform: rotate(90deg); }
+.ferramenta { font-family: var(--mono); font-weight: 500; color: var(--tinta); }
+.args { font-family: var(--mono); font-size: 0.8125rem; }
+pre.json {
+  margin: 0; padding: 12px; border-top: 1px dashed var(--linha); overflow-x: auto; max-height: 320px;
+  font-family: var(--mono); font-size: 0.78rem; line-height: 1.45; color: var(--tinta);
+}
+
+/* Chips e estados */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 0.78rem; padding: 3px 9px; border-radius: 6px; background: var(--papel); border: 1px solid var(--linha); }
+.estado { display: inline-block; font-size: 0.8125rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.estado.ok { background: var(--ok-fundo); color: var(--elo-texto); }
+.estado.aviso { background: var(--aviso-fundo); color: var(--aviso); }
+.estado.corte { background: var(--corte-fundo); color: var(--corte); }
+.estado.neutro { background: var(--papel); color: var(--tinta-suave); }
+
+/* Ficha e token */
+dl.campos { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 0.9375rem; }
+dl.campos dt { color: var(--tinta-suave); }
+dl.campos dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+/* Checagens do checkout */
+.checagem { display: grid; gap: 8px; padding: 14px 0; border-top: 1px solid var(--linha); }
+.checagem:first-of-type { border-top: 0; padding-top: 0; }
+.checagem-topo { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.checagem h4 { margin: 0; font-size: 1rem; }
+
+/* Tabela de vendas */
+.tabela-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-weight: 500; color: var(--tinta-suave); font-size: 0.8125rem; padding: 6px 8px; border-bottom: 1px solid var(--linha); }
+td { padding: 9px 8px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+td.valor { text-align: right; white-space: nowrap; }
+td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--papel); }
+tbody tr[aria-selected="true"] td { background: var(--ok-fundo); }
+.totais { display: flex; gap: 24px; flex-wrap: wrap; }
+.total b { display: block; font-size: 1.375rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.total span { font-size: 0.8125rem; color: var(--tinta-suave); }
+
+/* O fio do Rastro */
+.rastro { list-style: none; margin: 0; padding: 0; display: grid; }
+.rastro li { position: relative; padding: 0 0 18px 34px; display: grid; gap: 2px; }
+.rastro li::before {
+  content: ""; position: absolute; left: 10px; top: 14px; bottom: -4px; width: 2px; background: var(--linha);
+}
+.rastro li:last-child::before { display: none; }
+.rastro li.no-fio::before { width: 6px; left: 8px; background: var(--elo); }
+.rastro .ponto {
+  position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--tinta-suave); background: var(--superficie);
+}
+.rastro li.contou .ponto { background: var(--elo); border-color: var(--elo); box-shadow: 0 0 0 4px var(--ok-fundo); }
+.rastro li.pagamento .ponto { border-radius: 4px; background: var(--tinta); border-color: var(--tinta); }
+.rastro li.estorno .ponto { border-radius: 4px; background: var(--corte); border-color: var(--corte); }
+.rastro .quando { font-size: 0.8125rem; color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+.rastro .evento { font-weight: 500; }
+.rastro .marca { font-size: 0.8125rem; }
+.rastro .marca.sim { color: var(--elo-texto); font-weight: 700; }
+.rastro .marca.nao { color: var(--tinta-suave); }
+
+.rodape { display: grid; gap: 8px; font-size: 0.875rem; color: var(--tinta-suave); max-width: 80ch; }
+.rodape p { margin: 0; }
+
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="cabecalho">
+    <p class="autoria">Protótipo para o Desafio de Inovação YouShop 2027, por Alexandre Vital Demolinari Pereira. Dados fictícios.</p>
+    <h1>Quando a compra acontece dentro de uma IA, quem paga o creator?</h1>
+    <p class="resumo"><strong>Elo</strong> é um servidor MCP que deixa agentes de IA recomendarem e venderem ofertas da YouShop usando só fatos aprovados pelo produtor, sem perder a comissão de quem trouxe o comprador. O <strong>Rastro</strong> explica ao creator, venda por venda, por que a comissão caiu ou não.</p>
+  </header>
+
+  <nav class="passos" role="tablist" aria-label="Etapas da demonstração">
+    <button class="passo" role="tab" id="aba-compra" aria-controls="ato-compra" aria-selected="true"><span class="num">1</span>O comprador conversa com o agente da Ana</button>
+    <button class="passo" role="tab" id="aba-checkout" aria-controls="ato-checkout" aria-selected="false" tabindex="-1"><span class="num">2</span>O checkout confere o link</button>
+    <button class="passo" role="tab" id="aba-rastro" aria-controls="ato-rastro" aria-selected="false" tabindex="-1"><span class="num">3</span>A Ana entende cada comissão</button>
+  </nav>
+
+  <!-- Ato 1 -->
+  <section class="palco" id="ato-compra" role="tabpanel" aria-labelledby="aba-compra">
+    <div class="coluna">
+      <h2 class="titulo-coluna">Conversa no ChatGPT, Claude ou Gemini, com o agente que a creator Ana Ribeiro publicou</h2>
+      <div class="conversa" id="conversa-compra"></div>
+    </div>
+    <aside class="coluna">
+      <h2 class="titulo-coluna">O que a plataforma vê</h2>
+      <div class="painel">
+        <h3>Ferramentas que este agente enxerga</h3>
+        <div class="chips" id="ferramentas-agente"></div>
+        <p class="nota">As ferramentas de vendas e comissões nem aparecem para o agente que a audiência usa.</p>
+      </div>
+      <div class="painel">
+        <h3>Ficha de fatos usada na resposta</h3>
+        <dl class="campos" id="ficha"></dl>
+        <p class="nota" id="ficha-fonte"></p>
+      </div>
+      <div class="painel">
+        <h3>Dentro do link de checkout</h3>
+        <dl class="campos" id="token"></dl>
+        <p class="nota">Token assinado pela plataforma. A creator vem da credencial da sessão: não é parâmetro de nenhuma ferramenta, então o modelo não consegue trocá-la.</p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Ato 2 -->
+  <section class="palco" id="ato-checkout" role="tabpanel" aria-labelledby="aba-checkout" hidden>
+    <div class="coluna">
+      <h2 class="titulo-coluna">Três situações reais testadas contra o servidor</h2>
+      <div class="painel" id="checagens"></div>
+    </div>
+    <aside class="coluna">
+      <h2 class="titulo-coluna">Por que isso importa</h2>
+      <div class="painel">
+        <p>Quem diz o preço e a garantia é a plataforma, nunca o modelo. Se o produtor mudou a oferta depois que o agente leu, o link é recusado e o agente recebe os valores atuais.</p>
+        <p>Um link adulterado continua vendendo: o comprador não é prejudicado. Só a atribuição é descartada, então ninguém ganha comissão forjando link.</p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Ato 3 -->
+  <section class="palco" id="ato-rastro" role="tabpanel" aria-labelledby="aba-rastro" hidden>
+    <div class="coluna">
+      <h2 class="titulo-coluna">A Ana pergunta ao assistente dela, conectado ao Elo com a credencial de creator</h2>
+      <div class="conversa" id="conversa-rastro"></div>
+      <div class="painel">
+        <div class="totais" id="totais"></div>
+        <div class="tabela-wrap">
+          <table>
+            <caption class="nota" style="text-align:left; caption-side: top; padding-bottom: 6px;">Escolha uma venda para ver o rastro dela.</caption>
+            <thead><tr><th scope="col">Venda</th><th scope="col">Produto</th><th scope="col">Status</th><th scope="col" style="text-align:right">Comissão</th></tr></thead>
+            <tbody id="vendas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <aside class="coluna">
+      <h2 class="titulo-coluna" id="titulo-rastro">Rastro da venda</h2>
+      <div class="painel">
+        <ol class="rastro" id="fio"></ol>
+        <p class="nota" id="regra"></p>
+        <p id="explicacao"></p>
+        <p class="nota" id="proximo"></p>
+        <p class="nota" id="privacidade"></p>
+      </div>
+    </aside>
+  </section>
+
+  <footer class="rodape">
+    <p>Como esta demo foi feita: as respostas das ferramentas abaixo de cada "chamou…" são saídas reais do servidor MCP, gravadas por um cliente MCP via stdio (<span class="args">scripts/gravar_demo.py</span>). As falas do comprador e o texto do agente no passo 1 são um roteiro ilustrativo; no passo 3, a explicação é o texto que o próprio servidor devolve.</p>
+    <p id="rodape-agora"></p>
+    <p id="rodape-codigo"></p>
+  </footer>
+</div>
+
+<script>
+const GRAVACAO = {"gerado_por": "scripts/gravar_demo.py (cliente MCP real, transporte stdio)", "agora_simulado": "22/11/2026 10:00", "compra": {"sessao": "agente:ag-ana-planilhas", "ferramentas": ["buscar_ofertas", "detalhar_oferta", "gerar_link_checkout"], "chamadas": [{"ferramenta": "buscar_ofertas", "argumentos": {"consulta": "excel para montar dashboards no trabalho", "preco_max": 200}, "resposta": {"criterio_de_ordenacao": "relevância do texto; comissão não influencia", "curadoria": "Agente da Ana, Finanças & Planilhas", "ofertas": [{"oferta_id": "of-excel-dashboard", "nome": "Excel do Zero ao Dashboard", "produtor": "Planilha Viva (Prof. Marina Lopes)", "tipo": "digital", "preco": 197.0, "garantia_dias": 15, "resumo_verificado": "Curso em vídeo para sair do zero e montar dashboards no Excel."}, {"oferta_id": "of-planilha-controle", "nome": "Planilha de Controle Financeiro (modelo pronto)", "produtor": "Bolso em Dia", "tipo": "digital", "preco": 37.0, "garantia_dias": 7, "resumo_verificado": "Modelo de planilha pronto para controlar gastos mensais."}]}}, {"ferramenta": "detalhar_oferta", "argumentos": {"oferta_id": "of-excel-dashboard"}, "resposta": {"oferta_id": "of-excel-dashboard", "nome": "Excel do Zero ao Dashboard", "produtor": "Planilha Viva (Prof. Marina Lopes)", "preco": 197.0, "parcelas_max": 12, "garantia_dias": 15, "politica_de_reembolso": "Reembolso integral se pedido em até 15 dias após a compra, pela própria plataforma.", "versao_ficha": 3, "fonte": "Ficha de fatos aprovada pelo produtor e conferida com o checkout. Não é texto de marketing.", "aprovada_em": "2026-11-18", "resumo": "Curso em vídeo para sair do zero e montar dashboards no Excel.", "conteudo": ["8 módulos, 42 aulas, cerca de 14 h de vídeo", "Fórmulas essenciais, tabela dinâmica, gráficos e dashboard final", "3 planilhas de exercício para baixar"], "para_quem": "Iniciantes que usam Excel no trabalho.", "nao_e_para": "Quem já domina tabela dinâmica e Power Query.", "acesso": "12 meses", "suporte": "Dúvidas por comentário na aula, resposta em até 2 dias úteis", "certificado": true, "nao_promete": ["Não garante emprego ou promoção."]}}, {"ferramenta": "gerar_link_checkout", "argumentos": {"oferta_id": "of-excel-dashboard", "versao_ficha": 2}, "resposta": {"erro": "ficha_desatualizada", "mensagem": "A oferta mudou desde a sua leitura. Releia com detalhar_oferta antes de informar valores ao comprador.", "versao_atual": 3, "preco_atual": 197.0, "garantia_dias_atual": 15}}, {"ferramenta": "gerar_link_checkout", "argumentos": {"oferta_id": "of-excel-dashboard", "versao_ficha": 3}, "resposta": {"link_checkout": "https://checkout.youshop.example/c/of-excel-dashboard?elo=eyJvIjoib2YtZXhjZWwtZGFzaGJvYXJkIiwidiI6MywiYSI6ImFnLWFuYS1wbGFuaWxoYXMiLCJjIjoiY3ItYW5hIiwiaWF0IjoxNzk1MzUyNDAwLCJleHAiOjE3OTU2MTE2MDB9.9IBVZZxYPoUfnLbpAgfKrEnPyhg8uTdmDrhulg5VkZk", "preco": 197.0, "garantia_dias": 15, "valido_ate": "25/11/2026 10:00", "divulgacao_obrigatoria": "Esta recomendação vem do agente de Ana Ribeiro, creator que recebe comissão se você comprar por este link. O preço é o mesmo para você.", "aviso_ao_comprador": "O pagamento é feito no checkout seguro da YouShop. Confira o valor lá antes de pagar."}}]}, "checkout": {"link_valido": {"oferta_id": "of-excel-dashboard", "preco": 197.0, "garantia_dias": 15, "toque": {"tipo": "agente", "creator_id": "cr-ana", "agente_id": "ag-ana-planilhas", "quando": "22/11/2026 10:00"}}, "link_adulterado": {"oferta_id": "of-excel-dashboard", "preco": 197.0, "toque": null, "aviso": "Atribuição ignorada (assinatura não confere)."}}, "painel_creator": {"sessao": "creator:cr-ana", "ferramentas": ["buscar_ofertas", "detalhar_oferta", "gerar_link_checkout", "minhas_vendas", "rastro_da_comissao"], "chamadas": [{"ferramenta": "minhas_vendas", "argumentos": {}, "resposta": {"creator": "Ana Ribeiro", "vendas": [{"venda_id": "V-1042", "produto": "Excel do Zero ao Dashboard", "pago_em": "20/11/2026 21:47", "status": "em_garantia", "comissao": 78.8, "libera_em": "05/12/2026"}, {"venda_id": "V-1031", "produto": "Excel do Zero ao Dashboard", "pago_em": "18/11/2026 19:05", "status": "nao_comissionada", "comissao": 0.0}, {"venda_id": "V-1019", "produto": "Finanças Pessoais na Prática", "pago_em": "15/11/2026 08:20", "status": "nao_comissionada", "comissao": 0.0}, {"venda_id": "V-1008", "produto": "Power BI Essencial", "pago_em": "09/11/2026 15:12", "status": "estornada", "comissao": 0.0}, {"venda_id": "V-0987", "produto": "Planilha de Controle Financeiro (modelo pronto)", "pago_em": "28/10/2026 12:30", "status": "liberada", "comissao": 18.5, "libera_em": "04/11/2026"}, {"venda_id": "V-0975", "produto": "Excel do Zero ao Dashboard", "pago_em": "12/11/2026 20:15", "status": "em_garantia", "comissao": 78.8, "libera_em": "27/11/2026"}], "a_liberar": 157.6, "liberado": 18.5, "dica": "Use rastro_da_comissao(venda_id) para entender qualquer linha."}}, {"ferramenta": "rastro_da_comissao", "argumentos": {"venda_id": "V-1042"}, "resposta": {"venda_id": "V-1042", "produto": "Excel do Zero ao Dashboard", "status": "em_garantia", "codigo_motivo": "aguardando_fim_da_garantia", "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).", "linha_do_tempo": [{"quando": "20/11/2026 21:31", "evento": "Agente da Ana (conversa no ChatGPT)", "seu": true, "contou_para_a_comissao": true}, {"quando": "20/11/2026 21:47", "evento": "Pagamento aprovado (Pix)", "seu": null, "contou_para_a_comissao": null}], "explicacao_base": "A venda é sua. A comissão de R$ 78,80 fica reservada até o fim da garantia de 15 dias e libera em 05/12/2026.", "proximo_passo": "Nada a fazer: é só aguardar a liberação.", "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."}}, {"ferramenta": "rastro_da_comissao", "argumentos": {"venda_id": "V-1031"}, "resposta": {"venda_id": "V-1031", "produto": "Excel do Zero ao Dashboard", "status": "nao_comissionada", "codigo_motivo": "toque_de_outro_creator_venceu", "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).", "linha_do_tempo": [{"quando": "16/11/2026 12:40", "evento": "Seu link no Instagram (stories)", "seu": true, "contou_para_a_comissao": false}, {"quando": "18/11/2026 19:03", "evento": "Cupom de outro creator", "seu": false, "contou_para_a_comissao": true}, {"quando": "18/11/2026 19:05", "evento": "Pagamento aprovado (Cartão 12x)", "seu": null, "contou_para_a_comissao": null}], "explicacao_base": "Seu link foi o primeiro contato do comprador, mas depois dele houve um toque de outro creator, e a regra desta oferta paga o último toque válido.", "proximo_passo": "Peça ao produtor um cupom exclusivo seu: assim o seu toque também aparece no momento da compra.", "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."}}, {"ferramenta": "rastro_da_comissao", "argumentos": {"venda_id": "V-1019"}, "resposta": {"venda_id": "V-1019", "produto": "Finanças Pessoais na Prática", "status": "nao_comissionada", "codigo_motivo": "seu_toque_fora_da_janela", "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).", "linha_do_tempo": [{"quando": "05/11/2026 22:10", "evento": "Seu link no YouTube (descrição do vídeo)", "seu": true, "contou_para_a_comissao": false}, {"quando": "15/11/2026 08:20", "evento": "Pagamento aprovado (Cartão 6x)", "seu": null, "contou_para_a_comissao": null}], "explicacao_base": "Seu link foi clicado, mas a compra aconteceu 9 dias depois. A janela desta oferta é de 7 dias, então o clique já não valia.", "proximo_passo": "Conteúdos de lembrete perto do fim da janela, ou o seu agente de recomendação, mantêm o seu toque válido mais perto da compra.", "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."}}, {"ferramenta": "rastro_da_comissao", "argumentos": {"venda_id": "V-1008"}, "resposta": {"venda_id": "V-1008", "produto": "Power BI Essencial", "status": "estornada", "codigo_motivo": "reembolso_dentro_da_garantia", "regra_aplicada": "Último toque válido de creator até 14 dias antes do pagamento (regra escolhida pelo produtor).", "linha_do_tempo": [{"quando": "09/11/2026 14:58", "evento": "Agente da Ana (conversa no Claude)", "seu": true, "contou_para_a_comissao": true}, {"quando": "09/11/2026 15:12", "evento": "Pagamento aprovado (Cartão 3x)", "seu": null, "contou_para_a_comissao": null}, {"quando": "13/11/2026 10:00", "evento": "Reembolso pedido pelo comprador (dentro da garantia)", "seu": null, "contou_para_a_comissao": null}], "explicacao_base": "A venda era sua, mas o comprador pediu reembolso dentro da garantia em 13/11/2026. Pela regra da plataforma, a comissão de R$ 118,80 foi estornada.", "proximo_passo": "Nenhuma ação sua é necessária. O direito de arrependimento é do comprador.", "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."}}, {"ferramenta": "rastro_da_comissao", "argumentos": {"venda_id": "V-0987"}, "resposta": {"venda_id": "V-0987", "produto": "Planilha de Controle Financeiro (modelo pronto)", "status": "liberada", "codigo_motivo": "liberada", "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).", "linha_do_tempo": [{"quando": "28/10/2026 12:22", "evento": "Seu link no Instagram (bio)", "seu": true, "contou_para_a_comissao": true}, {"quando": "28/10/2026 12:30", "evento": "Pagamento aprovado (Pix)", "seu": null, "contou_para_a_comissao": null}], "explicacao_base": "A venda é sua e a comissão de R$ 18,50 já foi liberada em 04/11/2026.", "proximo_passo": "Valor disponível para saque.", "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."}}, {"ferramenta": "rastro_da_comissao", "argumentos": {"venda_id": "V-0975"}, "resposta": {"venda_id": "V-0975", "produto": "Excel do Zero ao Dashboard", "status": "em_garantia", "codigo_motivo": "aguardando_fim_da_garantia", "regra_aplicada": "Último toque válido de creator até 7 dias antes do pagamento (regra escolhida pelo produtor).", "linha_do_tempo": [{"quando": "11/11/2026 18:30", "evento": "Seu link no TikTok", "seu": true, "contou_para_a_comissao": true}, {"quando": "12/11/2026 20:09", "evento": "Agente sem creator (não gera nem tira comissão)", "seu": false, "contou_para_a_comissao": false}, {"quando": "12/11/2026 20:15", "evento": "Pagamento aprovado (Pix)", "seu": null, "contou_para_a_comissao": null}], "explicacao_base": "A venda é sua. A comissão de R$ 78,80 fica reservada até o fim da garantia de 15 dias e libera em 27/11/2026. O comprador terminou a compra num assistente de IA sem creator; pela regra do Elo, agente sem creator não tira a comissão de quem trouxe o comprador.", "proximo_passo": "Nada a fazer: é só aguardar a liberação.", "privacidade": "Por privacidade, não mostramos quem é o outro creator nem dados do comprador."}}]}};
+const CODIGO_URL = "https://github.com/xandaodev/youshop-elo";
+
+const brl = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const el = (tag, attrs = {}, ...filhos) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v; else if (k === "html") n.innerHTML = v; else n.setAttribute(k, v);
+  }
+  for (const f of filhos) if (f != null) n.append(f);
+  return n;
+};
+const chamadas = sessao => sessao.chamadas;
+const achar = (sessao, nome, pred = () => true) => chamadas(sessao).find(c => c.ferramenta === nome && pred(c));
+
+function argsTexto(args) {
+  const partes = Object.entries(args).map(([k, v]) => `${k}: ${JSON.stringify(v)}`);
+  return partes.join(", ");
+}
+function blocoChamada(c, aberto = false) {
+  const d = el("details", { class: "chamada" });
+  if (aberto) d.open = true;
+  const s = el("summary", {}, "chamou", el("span", { class: "ferramenta" }, c.ferramenta), el("span", { class: "args" }, `(${argsTexto(c.argumentos)})`));
+  d.append(s, el("pre", { class: "json" }, JSON.stringify(c.resposta, null, 2)));
+  return d;
+}
+function msg(tipo, quem, ...conteudo) {
+  return el("div", { class: `msg ${tipo}` }, el("span", { class: "quem" }, quem), ...conteudo);
+}
+function p(texto) { return el("p", {}, texto); }
+
+function decodificarToken(link) {
+  const token = new URL(link).searchParams.get("elo");
+  const corpo = token.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
+  const json = decodeURIComponent(escape(atob(corpo + "=".repeat((4 - corpo.length % 4) % 4))));
+  return JSON.parse(json);
+}
+const dataHora = s => new Date(s * 1000).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+/* ---------------- Ato 1 ---------------- */
+function montarCompra() {
+  const s = GRAVACAO.compra;
+  const busca = achar(s, "buscar_ofertas");
+  const ficha = achar(s, "detalhar_oferta").resposta;
+  const linkOk = achar(s, "gerar_link_checkout", c => !c.resposta.erro);
+  const r = linkOk.resposta;
+  const alt = busca.resposta.ofertas.find(o => o.oferta_id !== ficha.oferta_id);
+
+  const conversa = document.getElementById("conversa-compra");
+  conversa.append(
+    msg("pessoa", "Comprador", p(`Quero aprender Excel pra montar dashboards no trabalho. Tenho até ${brl(200)} e quero garantia. O que você recomenda?`)),
+    blocoChamada(busca),
+    blocoChamada(achar(s, "detalhar_oferta")),
+    msg("agente", "Agente da Ana",
+      p(`Pela curadoria da Ana, o que melhor encaixa é o ${ficha.nome}, da ${ficha.produtor}.`),
+      el("ul", {},
+        el("li", {}, `${ficha.conteudo[0]}: ${ficha.conteudo[1].toLowerCase()}.`),
+        el("li", {}, `${brl(ficha.preco)}, em até ${ficha.parcelas_max}x. Acesso por ${ficha.acesso}, com certificado.`),
+        el("li", {}, `Garantia de ${ficha.garantia_dias} dias: dá para pedir reembolso integral pela própria plataforma.`)),
+      p(`É para iniciantes. Não vale a pena para quem já domina tabela dinâmica e Power Query, e não garante emprego ou promoção.`),
+      alt ? p(`Se você só precisa de uma planilha pronta, existe o modelo de ${brl(alt.preco)}.`) : null),
+    msg("pessoa", "Comprador", p("Fechou. Me manda o link.")),
+    blocoChamada(linkOk),
+    msg("agente", "Agente da Ana",
+      p("Aqui está o link para pagar:"),
+      el("span", { class: "link-falso" }, r.link_checkout.slice(0, 64) + "…"),
+      el("p", { class: "divulgacao" }, r.divulgacao_obrigatoria),
+      p(r.aviso_ao_comprador))
+  );
+
+  const chips = document.getElementById("ferramentas-agente");
+  s.ferramentas.forEach(f => chips.append(el("span", { class: "chip" }, f)));
+
+  const dl = document.getElementById("ficha");
+  [["Preço", `${brl(ficha.preco)} em até ${ficha.parcelas_max}x`],
+   ["Garantia", `${ficha.garantia_dias} dias`],
+   ["Conteúdo", ficha.conteudo.join("; ")],
+   ["Para quem", ficha.para_quem],
+   ["Não é para", ficha.nao_e_para],
+   ["Não promete", ficha.nao_promete.join(" ")],
+   ["Versão", `${ficha.versao_ficha}, aprovada em ${ficha.aprovada_em.split("-").reverse().join("/")}`]
+  ].forEach(([k, v]) => dl.append(el("dt", {}, k), el("dd", {}, v)));
+  document.getElementById("ficha-fonte").textContent = ficha.fonte + " O rascunho mais novo, gerado por IA, ainda não foi aprovado e por isso nunca chega aos agentes.";
+
+  const t = decodificarToken(r.link_checkout);
+  const tk = document.getElementById("token");
+  [["Oferta", t.o], ["Versão da ficha", String(t.v)], ["Agente", t.a], ["Creator", t.c], ["Emitido em", dataHora(t.iat)], ["Vale até", dataHora(t.exp)]]
+    .forEach(([k, v]) => tk.append(el("dt", {}, k), el("dd", {}, v)));
+}
+
+/* ---------------- Ato 2 ---------------- */
+function montarCheckout() {
+  const s = GRAVACAO.compra;
+  const caixa = document.getElementById("checagens");
+  const valido = GRAVACAO.checkout.link_valido;
+  const adulterado = GRAVACAO.checkout.link_adulterado;
+  const velha = achar(s, "gerar_link_checkout", c => c.resposta.erro === "ficha_desatualizada");
+
+  const item = (titulo, estadoTxt, estadoCls, texto, detalhe) => {
+    const d = el("details", { class: "chamada" });
+    d.append(el("summary", {}, "ver resposta real"), el("pre", { class: "json" }, JSON.stringify(detalhe, null, 2)));
+    return el("div", { class: "checagem" },
+      el("div", { class: "checagem-topo" }, el("h4", {}, titulo), el("span", { class: `estado ${estadoCls}` }, estadoTxt)),
+      p(texto), d);
+  };
+  caixa.append(
+    item("Comprador abre o link gerado pelo agente", "Venda atribuída", "ok",
+      `Assinatura e validade conferem. O checkout registra um toque do agente da Ana às ${valido.toque.quando} e cobra ${brl(valido.preco)}, o valor configurado pelo produtor.`, valido),
+    item("Alguém altera o link para tentar levar a comissão", "Atribuição ignorada", "corte",
+      `A assinatura não confere. A venda segue normalmente por ${brl(adulterado.preco)}, mas nenhum creator é registrado.`, adulterado),
+    item("O agente usa uma versão antiga da ficha", "Link recusado", "aviso",
+      `O agente tentou gerar o link com a versão ${velha.argumentos.versao_ficha}. O servidor recusou e devolveu o preço atual (${brl(velha.resposta.preco_atual)}) e a garantia atual (${velha.resposta.garantia_dias_atual} dias).`, velha.resposta)
+  );
+}
+
+/* ---------------- Ato 3 ---------------- */
+const ESTADOS = {
+  em_garantia: ["Em garantia", "aviso"],
+  liberada: ["Liberada", "ok"],
+  nao_comissionada: ["Sem comissão", "neutro"],
+  estornada: ["Estornada", "corte"],
+};
+
+function montarRastro() {
+  const s = GRAVACAO.painel_creator;
+  const lista = achar(s, "minhas_vendas").resposta;
+  const conversa = document.getElementById("conversa-rastro");
+  const semComissao = lista.vendas.filter(v => v.status === "nao_comissionada").map(v => v.venda_id);
+  const estornadas = lista.vendas.filter(v => v.status === "estornada").map(v => v.venda_id);
+  const pergunta = achar(s, "rastro_da_comissao", c => c.argumentos.venda_id === "V-1031");
+
+  conversa.append(
+    msg("pessoa", "Ana", p("Quanto eu tenho pra receber? E o que aconteceu com as vendas que não pagaram?")),
+    blocoChamada(achar(s, "minhas_vendas")),
+    msg("agente", "Assistente da Ana",
+      p(`Você tem ${brl(lista.a_liberar)} a liberar e ${brl(lista.liberado)} já liberados. ${semComissao.length} vendas não geraram comissão (${semComissao.join(" e ")}) e ${estornadas.length} foi estornada (${estornadas.join(", ")}).`)),
+    msg("pessoa", "Ana", p("Por que a V-1031 não me pagou? Fui eu que indiquei.")),
+    blocoChamada(pergunta),
+    msg("agente", "Assistente da Ana", p(pergunta.resposta.explicacao_base), p(pergunta.resposta.proximo_passo))
+  );
+
+  const totais = document.getElementById("totais");
+  totais.append(
+    el("div", { class: "total" }, el("b", {}, brl(lista.a_liberar)), el("span", {}, "a liberar (em garantia)")),
+    el("div", { class: "total" }, el("b", {}, brl(lista.liberado)), el("span", {}, "já liberado")));
+
+  const corpo = document.getElementById("vendas");
+  lista.vendas.forEach(v => {
+    const [rot, cls] = ESTADOS[v.status];
+    const tr = el("tr", { tabindex: "0", "data-venda": v.venda_id, "aria-selected": "false" },
+      el("td", {}, v.venda_id),
+      el("td", {}, v.produto),
+      el("td", {}, el("span", { class: `estado ${cls}` }, rot)),
+      el("td", { class: "valor" }, v.comissao ? brl(v.comissao) : "—"));
+    const escolher = () => mostrarRastro(v.venda_id);
+    tr.addEventListener("click", escolher);
+    tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); escolher(); } });
+    corpo.append(tr);
+  });
+  mostrarRastro("V-1031");
+}
+
+function mostrarRastro(id) {
+  const s = GRAVACAO.painel_creator;
+  const c = achar(s, "rastro_da_comissao", x => x.argumentos.venda_id === id);
+  if (!c) return;
+  const r = c.resposta;
+  document.querySelectorAll("#vendas tr").forEach(tr => tr.setAttribute("aria-selected", String(tr.dataset.venda === id)));
+  document.getElementById("titulo-rastro").textContent = `Rastro da venda ${id}: ${r.produto}`;
+
+  const fio = document.getElementById("fio");
+  fio.replaceChildren();
+  const idxVencedor = r.linha_do_tempo.findIndex(e => e.contou_para_a_comissao === true);
+  const idxPagamento = r.linha_do_tempo.findIndex(e => e.evento.startsWith("Pagamento"));
+  r.linha_do_tempo.forEach((e, i) => {
+    const classes = [];
+    if (e.contou_para_a_comissao === true) classes.push("contou");
+    if (e.evento.startsWith("Pagamento")) classes.push("pagamento");
+    if (e.evento.startsWith("Reembolso")) classes.push("estorno");
+    if (idxVencedor >= 0 && i >= idxVencedor && i < idxPagamento) classes.push("no-fio");
+    let marca = null;
+    if (e.contou_para_a_comissao === true) marca = el("span", { class: "marca sim" }, e.seu ? "Este toque é seu e contou para a comissão" : "Este toque contou para a comissão");
+    else if (e.contou_para_a_comissao === false) marca = el("span", { class: "marca nao" }, e.seu ? "Seu toque, mas não contou" : "Não contou");
+    fio.append(el("li", { class: classes.join(" ") },
+      el("span", { class: "ponto", "aria-hidden": "true" }),
+      el("span", { class: "quando" }, e.quando),
+      el("span", { class: "evento" }, e.evento), marca));
+  });
+  document.getElementById("regra").textContent = `Regra aplicada: ${r.regra_aplicada}`;
+  document.getElementById("explicacao").textContent = r.explicacao_base;
+  document.getElementById("proximo").textContent = `Próximo passo: ${r.proximo_passo}`;
+  document.getElementById("privacidade").textContent = r.privacidade;
+}
+
+/* ---------------- Abas ---------------- */
+function ativarAbas() {
+  const abas = [...document.querySelectorAll('[role="tab"]')];
+  const ids = { "aba-compra": "compra", "aba-checkout": "checkout", "aba-rastro": "rastro" };
+  const mostrar = (aba, foco = false) => {
+    abas.forEach(a => {
+      const sel = a === aba;
+      a.setAttribute("aria-selected", String(sel));
+      a.tabIndex = sel ? 0 : -1;
+      document.getElementById(a.getAttribute("aria-controls")).hidden = !sel;
+    });
+    if (foco) aba.focus();
+    try { history.replaceState(null, "", "#" + ids[aba.id]); } catch (_) {}
+  };
+  abas.forEach((a, i) => {
+    a.addEventListener("click", () => mostrar(a));
+    a.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") mostrar(abas[(i + 1) % abas.length], true);
+      if (e.key === "ArrowLeft") mostrar(abas[(i - 1 + abas.length) % abas.length], true);
+    });
+  });
+  const inicial = Object.entries(ids).find(([, v]) => "#" + v === location.hash);
+  if (inicial) mostrar(document.getElementById(inicial[0]));
+  window.addEventListener("hashchange", () => {
+    const alvo = Object.entries(ids).find(([, v]) => "#" + v === location.hash);
+    if (alvo) mostrar(document.getElementById(alvo[0]));
+  });
+}
+
+montarCompra();
+montarCheckout();
+montarRastro();
+ativarAbas();
+document.getElementById("rodape-agora").textContent = `Datas simuladas: o "agora" da demo é ${GRAVACAO.agora_simulado}. Domínio de checkout fictício (.example). Nada aqui usa dados ou sistemas reais da YouShop.`;
+if (CODIGO_URL) {
+  const pc = document.getElementById("rodape-codigo");
+  pc.append("Código, testes e instruções para rodar no Claude Desktop: ", el("a", { href: CODIGO_URL }, CODIGO_URL));
+}
+</script>
+</body>
+</html>
